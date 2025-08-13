@@ -2,6 +2,8 @@ exports.handler = async function () {
   const API_KEY = process.env.YOUTUBE_API_KEY;
   const channelId = process.env.YOUTUBE_CHANNEL_ID;
 
+  console.log("start youtube function");
+
   if (!API_KEY) {
     return {
       statusCode: 500,
@@ -20,13 +22,38 @@ exports.handler = async function () {
     const latestVideoUrl = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${channelId}&part=snippet&order=date&maxResults=1&type=video`;
     const liveCheckUrl = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${channelId}&part=snippet&eventType=live&type=video&maxResults=1`;
 
+    console.log("Fetching latestVideoUrl:", latestVideoUrl);
+    console.log("Fetching liveCheckUrl:", liveCheckUrl);
+
     const [searchRes, liveRes] = await Promise.all([
       fetch(latestVideoUrl),
       fetch(liveCheckUrl),
     ]);
 
-    if (!searchRes.ok) throw new Error("Erreur lors de la récupération des vidéos (latest)");
-    if (!liveRes.ok) throw new Error("Erreur lors de la vérification du live");
+    if (!searchRes.ok) {
+      const errorBody = await searchRes.text();
+      console.error("Erreur lors de la récupération des vidéos (latest):", searchRes.status, errorBody);
+      return {
+        statusCode: 500,
+        body: JSON.stringify({
+          error: "Erreur lors de la récupération des vidéos (latest)",
+          status: searchRes.status,
+          body: errorBody,
+        }),
+      };
+    }
+    if (!liveRes.ok) {
+      const errorBody = await liveRes.text();
+      console.error("Erreur lors de la vérification du live:", liveRes.status, errorBody);
+      return {
+        statusCode: 500,
+        body: JSON.stringify({
+          error: "Erreur lors de la vérification du live",
+          status: liveRes.status,
+          body: errorBody,
+        }),
+      };
+    }
 
     const searchData = await searchRes.json();
     const liveDataRaw = await liveRes.json();
@@ -88,6 +115,8 @@ exports.handler = async function () {
       videoData,
       liveData,
     };
+
+    console.log(responsePayload);
 
     return {
       statusCode: 200,
