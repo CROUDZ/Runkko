@@ -1,0 +1,10 @@
+# Ignore IDE and editor settings
+.vscode/
+# Ignore build directories
+build/
+dist/
+
+# Ignore node modules
+node_modules/
+
+.next/
