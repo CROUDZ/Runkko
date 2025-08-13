@@ -153,35 +153,45 @@ const LastVideosSection: React.FC = () => {
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               {/* Video Thumbnail */}
               <m.div whileHover={{ scale: 1.02 }} className="relative group">
-                <div className="relative overflow-hidden rounded-2xl shadow-2xl">
-                  <Image
-                    src={latestVideo.thumbnail}
-                    alt={latestVideo.title}
-                    width={800}
-                    height={450}
-                    className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
+                {/* Rendre la miniature cliquable */}
+                <a
+                  href={`https://www.youtube.com/watch?v=${latestVideo.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block cursor-pointer"
+                  tabIndex={0}
+                  aria-label={`Regarder ${latestVideo.title} sur YouTube`}
+                >
+                  <div className="relative overflow-hidden rounded-2xl shadow-2xl">
+                    <Image
+                      src={latestVideo.thumbnail}
+                      alt={latestVideo.title}
+                      width={800}
+                      height={450}
+                      className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
 
-                  {/* Play overlay */}
-                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                    <m.div
-                      whileHover={{ scale: 1.1 }}
-                      className="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center shadow-lg"
-                    >
-                      <Play
-                        className="w-8 h-8 text-white ml-1"
-                        fill="currentColor"
-                      />
-                    </m.div>
-                  </div>
-
-                  {/* Duration badge */}
-                  {latestVideo.duration && (
-                    <div className="absolute bottom-4 right-4 bg-black/80 text-white px-2 py-1 rounded text-sm font-medium">
-                      {formatDuration(latestVideo.duration)}
+                    {/* Play overlay */}
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
+                      <m.div
+                        whileHover={{ scale: 1.1 }}
+                        className="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center shadow-lg"
+                      >
+                        <Play
+                          className="w-8 h-8 text-white ml-1"
+                          fill="currentColor"
+                        />
+                      </m.div>
                     </div>
-                  )}
-                </div>
+
+                    {/* Duration badge */}
+                    {latestVideo.duration && (
+                      <div className="absolute bottom-4 right-4 bg-black/80 text-white px-2 py-1 rounded text-sm font-medium">
+                        {formatDuration(latestVideo.duration)}
+                      </div>
+                    )}
+                  </div>
+                </a>
               </m.div>
 
               {/* Video Info */}
