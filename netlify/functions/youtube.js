@@ -1,8 +1,46 @@
+// Cache simple en mémoire (sera réinitialisé à chaque déploiement)
+let cache = {
+  data: null,
+  timestamp: 0,
+  duration: 5 * 60 * 1000, // 5 minutes
+  errorTimestamp: 0,
+  quotaExceeded: false,
+};
+
 exports.handler = async function () {
   const API_KEY = process.env.YOUTUBE_API_KEY;
   const channelId = process.env.YOUTUBE_CHANNEL_ID;
 
   console.log("start youtube function");
+
+  // Si quota dépassé récemment, retourner données par défaut pendant 24h
+  const now = Date.now();
+  if (cache.quotaExceeded && (now - cache.errorTimestamp) < 24 * 60 * 60 * 1000) {
+    console.log("Quota exceeded recently, returning default data");
+    const fallbackData = {
+      videoData: null,
+      liveData: { isLive: false, url: false }
+    };
+    return {
+      statusCode: 200,
+      headers: {
+        'Cache-Control': 'public, max-age=3600',
+      },
+      body: JSON.stringify(fallbackData),
+    };
+  }
+
+  // Vérifier le cache d'abord
+  if (cache.data && (now - cache.timestamp) < cache.duration) {
+    console.log("Returning cached data");
+    return {
+      statusCode: 200,
+      headers: {
+        'Cache-Control': 'public, max-age=300',
+      },
+      body: JSON.stringify(cache.data),
+    };
+  }
 
   if (!API_KEY) {
     return {
@@ -30,9 +68,34 @@ exports.handler = async function () {
       fetch(liveCheckUrl),
     ]);
 
+    // Gérer spécifiquement l'erreur de quota dépassé
     if (!searchRes.ok) {
       const errorBody = await searchRes.text();
       console.error("Erreur lors de la récupération des vidéos (latest):", searchRes.status, errorBody);
+      
+      // Gérer spécifiquement l'erreur de quota dépassé
+      if (searchRes.status === 403) {
+        console.error("QUOTA EXCEEDED - Setting 24h cache");
+        const fallbackData = {
+          videoData: null,
+          liveData: { isLive: false, url: false }
+        };
+        
+        // Marquer le quota comme dépassé pour 24h
+        cache.quotaExceeded = true;
+        cache.errorTimestamp = now;
+        cache.data = fallbackData;
+        cache.timestamp = now;
+        
+        return {
+          statusCode: 200,
+          headers: {
+            'Cache-Control': 'public, max-age=86400', // Cache 24 heures
+          },
+          body: JSON.stringify(fallbackData),
+        };
+      }
+      
       return {
         statusCode: 500,
         body: JSON.stringify({
@@ -42,25 +105,37 @@ exports.handler = async function () {
         }),
       };
     }
+    
     if (!liveRes.ok) {
       const errorBody = await liveRes.text();
       console.error("Erreur lors de la vérification du live:", liveRes.status, errorBody);
-      return {
-        statusCode: 500,
-        body: JSON.stringify({
-          error: "Erreur lors de la vérification du live",
-          status: liveRes.status,
-          body: errorBody,
-        }),
-      };
+      
+      // Si quota dépassé pour le live, continuer avec juste les données de vidéo
+      if (liveRes.status === 403) {
+        console.log("Quota dépassé pour le live check, on continue sans");
+      } else {
+        return {
+          statusCode: 500,
+          body: JSON.stringify({
+            error: "Erreur lors de la vérification du live",
+            status: liveRes.status,
+            body: errorBody,
+          }),
+        };
+      }
     }
 
     const searchData = await searchRes.json();
-    const liveDataRaw = await liveRes.json();
+    let liveDataRaw = null;
+    
+    // Essayer de récupérer les données live seulement si la requête a réussi
+    if (liveRes.ok) {
+      liveDataRaw = await liveRes.json();
+    }
 
     // --- Préparer liveData ---
     let liveData = { isLive: false, url: false };
-    if (liveDataRaw.items && liveDataRaw.items.length > 0) {
+    if (liveDataRaw && liveDataRaw.items && liveDataRaw.items.length > 0) {
       const liveVideo = liveDataRaw.items[0];
       const liveVideoId = liveVideo.id?.videoId;
       if (liveVideoId) {
@@ -116,10 +191,18 @@ exports.handler = async function () {
       liveData,
     };
 
+    // Mettre en cache la réponse et reset quota exceeded
+    cache.data = responsePayload;
+    cache.timestamp = now;
+    cache.quotaExceeded = false; // Reset quota exceeded flag on success
+
     console.log(responsePayload);
 
     return {
       statusCode: 200,
+      headers: {
+        'Cache-Control': 'public, max-age=300', // Cache côté client de 5 minutes
+      },
       body: JSON.stringify(responsePayload),
     };
   } catch (err) {

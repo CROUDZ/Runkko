@@ -8,22 +8,35 @@ import { Play, Users, ExternalLink } from "lucide-react";
 import RunkkoBody from "@/assets/runkko-body.webp";
 
 const HeroSection: React.FC = () => {
-  const [liveData, setLiveData] = useState<{ isLive: boolean; url: string | false } | null>(null);
+  const [liveData, setLiveData] = useState<{ isLive: boolean; url: string | false }>({ isLive: false, url: false });
 
   useEffect(() => {
+    let isMounted = true;
+    
     const fetchLiveData = async () => {
       try {
         const response = await fetch("/.netlify/functions/youtube");
-        if (!response.ok) throw new Error("Failed to fetch live data");
+        if (!response.ok) {
+          console.warn("YouTube API unavailable, using default data");
+          return;
+        }
+        
         const data = await response.json();
-        setLiveData(data.liveData);
+        if (isMounted && data.liveData) {
+          setLiveData(data.liveData);
+        }
       } catch (error) {
-        console.error("Error fetching live data:", error);
+        console.warn("Error fetching live data, using default:", error);
       }
     };
 
+    // Un seul appel au montage du composant
     fetchLiveData();
-  }, []);
+
+    return () => {
+      isMounted = false;
+    };
+  }, []); // Dépendance vide - un seul appel
 
   return (
     <section className="relative min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 overflow-hidden">
@@ -32,11 +45,11 @@ const HeroSection: React.FC = () => {
       <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
 
       {/* Floating particles effect */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 hidden sm:block">
         {[...Array(6)].map((_, i) => (
           <m.div
             key={i}
-            className="absolute w-2 h-2 bg-white rounded-full opacity-20"
+            className="absolute w-1 h-1 sm:w-2 sm:h-2 bg-white rounded-full opacity-20"
             animate={{
               y: [-20, -100],
               opacity: [0, 1, 0],
@@ -55,25 +68,25 @@ const HeroSection: React.FC = () => {
         ))}
       </div>
 
-      <div className="relative z-10 container mx-auto px-4 pt-20 pb-10">
-        <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[80vh]">
+      <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 pb-8 sm:pb-10">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-[calc(100vh-8rem)] sm:min-h-[80vh]">
           {/* Left Content */}
           <m.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-white space-y-8"
+            className="text-white space-y-6 sm:space-y-8 order-2 lg:order-1 text-center sm:text-left flex flex-col items-center sm:items-start"
           >
             {/* Badge */}
             <m.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className={`inline-flex items-center px-4 py-2 ${
-                liveData?.isLive ? "bg-red-600/20 border border-red-500/30 text-red-300" : "bg-gray-600/20 border border-gray-500/30 text-gray-300"
-              } rounded-full text-sm font-medium`}
+              className={`inline-flex items-center px-3 sm:px-4 py-2 mt-4 sm:mt-6 ${
+                liveData.isLive ? "bg-red-600/20 border border-red-500/30 text-red-300" : "bg-gray-600/20 border border-gray-500/30 text-gray-300"
+              } rounded-full text-xs sm:text-sm font-medium`}
             >
-              {liveData?.isLive ? (
+              {liveData.isLive ? (
                 <>
                   🔴 EN LIVE • <a href={liveData.url || "#"} target="_blank" rel="noopener noreferrer" className="underline">Minecraft Bedwars</a>
                 </>
@@ -87,8 +100,9 @@ const HeroSection: React.FC = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
+              className="w-full"
             >
-              <h1 className="text-5xl lg:text-7xl font-bold leading-tight">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
                 Bienvenue sur
                 <span className="block bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500 bg-clip-text text-transparent">
                   Runkko
@@ -101,7 +115,7 @@ const HeroSection: React.FC = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
-              className="text-xl lg:text-2xl text-gray-300 leading-relaxed max-w-2xl"
+              className="text-lg sm:text-xl lg:text-2xl text-gray-300 leading-relaxed max-w-2xl mx-auto sm:mx-0"
             >
               🎮 <strong>100% fun, skill et bonne humeur</strong> ! Spécialiste
               Minecraft Bedwars avec des clutchs de fou, du multi-gaming et des
@@ -113,14 +127,14 @@ const HeroSection: React.FC = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
-              className="flex flex-wrap gap-6 text-sm"
+              className="flex flex-wrap gap-3 sm:gap-6 text-xs sm:text-sm justify-center sm:justify-start"
             >
-              <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-lg">
-                <Play className="w-4 h-4 text-red-400" />
+              <div className="flex items-center gap-2 bg-white/10 px-3 sm:px-4 py-2 rounded-lg">
+                <Play className="w-3 h-3 sm:w-4 sm:h-4 text-red-400" />
                 <span>Videos épiques</span>
               </div>
-              <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-lg">
-                <Users className="w-4 h-4 text-blue-400" />
+              <div className="flex items-center gap-2 bg-white/10 px-3 sm:px-4 py-2 rounded-lg">
+                <Users className="w-3 h-3 sm:w-4 sm:h-4 text-blue-400" />
                 <span>Communauté active</span>
               </div>
             </m.div>
@@ -130,20 +144,20 @@ const HeroSection: React.FC = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1 }}
-              className="flex flex-col sm:flex-row gap-4"
+              className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center sm:items-start"
             >
               {/* YouTube CTA */}
               <m.a
                 href="https://www.youtube.com/@Runkko_YT"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center px-8 py-4 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-lg hover:shadow-red-600/25 group"
+                className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-lg hover:shadow-red-600/25 group text-sm sm:text-base"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <Play className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2 group-hover:scale-110 transition-transform" />
                 Ma chaîne YouTube
-                <ExternalLink className="w-4 h-4 ml-2 opacity-70" />
+                <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 ml-2 opacity-70" />
               </m.a>
 
               {/* Discord CTA */}
@@ -151,13 +165,13 @@ const HeroSection: React.FC = () => {
                 href="https://discord.gg/t6U4hZDrnF"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-lg hover:shadow-indigo-600/25 group"
+                className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-lg hover:shadow-indigo-600/25 group text-sm sm:text-base"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <Users className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                <Users className="w-4 h-4 sm:w-5 sm:h-5 mr-2 group-hover:scale-110 transition-transform" />
                 Rejoindre Discord
-                <ExternalLink className="w-4 h-4 ml-2 opacity-70" />
+                <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 ml-2 opacity-70" />
               </m.a>
             </m.div>
           </m.div>
@@ -167,7 +181,7 @@ const HeroSection: React.FC = () => {
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="relative flex justify-center lg:justify-end"
+            className="relative flex justify-center lg:justify-end order-1 lg:order-2 mt-8 sm:mt-0"
           >
             {/* Glow effect behind character */}
             <div className="absolute inset-0 bg-gradient-to-t from-yellow-400/20 via-transparent to-transparent rounded-full blur-3xl scale-150"></div>
@@ -183,7 +197,7 @@ const HeroSection: React.FC = () => {
                 alt="Runkko - Personnage Minecraft"
                 width={400}
                 height={600}
-                className="w-80 lg:w-96 h-auto object-contain drop-shadow-2xl"
+                className="w-64 sm:w-80 lg:w-96 h-auto object-contain drop-shadow-2xl"
                 priority
               />
             </m.div>
@@ -192,12 +206,12 @@ const HeroSection: React.FC = () => {
             <m.div
               animate={{ rotate: 360 }}
               transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-              className="absolute top-10 right-10 w-20 h-20 border-2 border-yellow-400/30 rounded-full"
+              className="absolute top-5 sm:top-10 right-5 sm:right-10 w-12 h-12 sm:w-20 sm:h-20 border-2 border-yellow-400/30 rounded-full hidden sm:block"
             />
             <m.div
               animate={{ rotate: -360 }}
               transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-              className="absolute bottom-20 left-10 w-16 h-16 border-2 border-pink-400/30 rounded-full"
+              className="absolute bottom-10 sm:bottom-20 left-5 sm:left-10 w-10 h-10 sm:w-16 sm:h-16 border-2 border-pink-400/30 rounded-full hidden sm:block"
             />
           </m.div>
         </div>
@@ -207,17 +221,17 @@ const HeroSection: React.FC = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5 }}
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+          className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 hidden sm:block"
         >
           <m.div
             animate={{ y: [0, 10, 0] }}
             transition={{ duration: 2, repeat: Infinity }}
-            className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center"
+            className="w-5 h-8 sm:w-6 sm:h-10 border-2 border-white/30 rounded-full flex justify-center"
           >
             <m.div
               animate={{ y: [0, 12, 0] }}
               transition={{ duration: 2, repeat: Infinity }}
-              className="w-1 h-3 bg-white/60 rounded-full mt-2"
+              className="w-1 h-2 sm:h-3 bg-white/60 rounded-full mt-1 sm:mt-2"
             />
           </m.div>
         </m.div>
