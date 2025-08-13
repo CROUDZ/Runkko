@@ -89,8 +89,6 @@ exports.handler = async function () {
       liveData,
     };
 
-    console.log(responsePayload);
-
     return {
       statusCode: 200,
       body: JSON.stringify(responsePayload),

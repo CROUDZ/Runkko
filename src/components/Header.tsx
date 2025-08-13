@@ -116,7 +116,7 @@ const Header: React.FC = () => {
           </m.a>
 
           <m.a
-            href="https://discord.gg/GSV2jReb"
+            href="https://discord.gg/t6U4hZDrnF"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-all duration-300 font-medium shadow-lg hover:shadow-indigo-600/25"
@@ -185,7 +185,7 @@ const Header: React.FC = () => {
                 </m.a>
 
                 <m.a
-                  href="https://discord.gg/GSV2jReb"
+                  href="https://discord.gg/t6U4hZDrnF"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg transition-all duration-300 font-medium"

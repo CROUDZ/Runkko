@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { m } from "framer-motion";
-import { Play, Calendar, Eye, ExternalLink } from "lucide-react";
+import { Play, Calendar, Eye, ExternalLink, AlertTriangle, RefreshCw } from "lucide-react";
+import LoadingSpinner from "../LoadingSpinner";
 
 interface VideoData {
   id: string;
@@ -123,24 +124,44 @@ const LastVideosSection: React.FC = () => {
             animate={{ opacity: 1 }}
             className="flex justify-center items-center py-20"
           >
-            <div className="flex flex-col items-center gap-4">
-              <div className="w-16 h-16 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin"></div>
-              <p className="text-gray-400">
-                Chargement de la dernière vidéo...
-              </p>
-            </div>
+            <LoadingSpinner 
+              size="lg"
+              message="Chargement de la dernière vidéo..."
+            />
           </m.div>
         ) : error ? (
           <m.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
             className="text-center py-20"
           >
-            <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-8 max-w-md mx-auto">
-              <p className="text-red-400 mb-4">❌ {error}</p>
-              <p className="text-gray-400 text-sm">
-                Vérifiez la configuration de l'API YouTube
+            <div className="bg-red-900/20 backdrop-blur-sm border border-red-500/30 rounded-2xl p-8 max-w-lg mx-auto">
+              <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <AlertTriangle className="w-8 h-8 text-red-400" />
+              </div>
+              
+              <h3 className="text-xl font-semibold text-red-300 mb-4">
+                Erreur de chargement
+              </h3>
+              
+              <p className="text-red-400 mb-6">
+                {error}
               </p>
+              
+              <p className="text-gray-400 text-sm mb-8">
+                Vérifiez votre connexion internet ou réessayez plus tard.
+              </p>
+
+              <m.button
+                onClick={() => window.location.reload()}
+                className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 group"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <RefreshCw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
+                Réessayer
+              </m.button>
             </div>
           </m.div>
         ) : latestVideo ? (

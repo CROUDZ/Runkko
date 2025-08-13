@@ -148,7 +148,7 @@ const HeroSection: React.FC = () => {
 
               {/* Discord CTA */}
               <m.a
-                href="https://discord.gg/GSV2jReb"
+                href="https://discord.gg/t6U4hZDrnF"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-lg hover:shadow-indigo-600/25 group"
