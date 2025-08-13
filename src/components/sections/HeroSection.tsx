@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { m } from "framer-motion";
 import { Play, Users, ExternalLink } from "lucide-react";
@@ -8,6 +8,23 @@ import { Play, Users, ExternalLink } from "lucide-react";
 import RunkkoBody from "@/assets/runkko-body.webp";
 
 const HeroSection: React.FC = () => {
+  const [liveData, setLiveData] = useState<{ isLive: boolean; url: string | false } | null>(null);
+
+  useEffect(() => {
+    const fetchLiveData = async () => {
+      try {
+        const response = await fetch("/.netlify/functions/youtube");
+        if (!response.ok) throw new Error("Failed to fetch live data");
+        const data = await response.json();
+        setLiveData(data.liveData);
+      } catch (error) {
+        console.error("Error fetching live data:", error);
+      }
+    };
+
+    fetchLiveData();
+  }, []);
+
   return (
     <section className="relative min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 overflow-hidden">
       {/* Background Effects */}
@@ -52,9 +69,17 @@ const HeroSection: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="inline-flex items-center px-4 py-2 bg-red-600/20 border border-red-500/30 rounded-full text-red-300 text-sm font-medium"
+              className={`inline-flex items-center px-4 py-2 ${
+                liveData?.isLive ? "bg-red-600/20 border border-red-500/30 text-red-300" : "bg-gray-600/20 border border-gray-500/30 text-gray-300"
+              } rounded-full text-sm font-medium`}
             >
-              🔴 EN LIVE • Minecraft Bedwars
+              {liveData?.isLive ? (
+                <>
+                  🔴 EN LIVE • <a href={liveData.url || "#"} target="_blank" rel="noopener noreferrer" className="underline">Minecraft Bedwars</a>
+                </>
+              ) : (
+                "⚪ Hors ligne"
+              )}
             </m.div>
 
             {/* Main Title */}

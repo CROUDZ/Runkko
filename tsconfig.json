@@ -27,7 +27,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "netlify/functions/youtube-latest.js"
+    "netlify/functions/youtube.js"
   ],
   "exclude": ["node_modules"]
 }

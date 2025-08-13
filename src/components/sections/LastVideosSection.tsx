@@ -24,7 +24,7 @@ const LastVideosSection: React.FC = () => {
     const fetchLatestVideo = async () => {
       try {
         // Appel à la fonction Netlify
-        const response = await fetch(`/.netlify/functions/youtube-latest`);
+        const response = await fetch(`/.netlify/functions/youtube`);
         if (!response.ok) {
           const errData = await response.json();
           setError(
@@ -33,7 +33,8 @@ const LastVideosSection: React.FC = () => {
           setLoading(false);
           return;
         }
-        const videoData = await response.json();
+        const data = await response.json();
+        const videoData: VideoData = data.videoData;
         setLatestVideo(videoData);
       } catch (err) {
         setError("Erreur lors du chargement de la vidéo");
