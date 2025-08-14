@@ -9,13 +9,32 @@ import RunkkoBody from "@/assets/runkko-body.webp";
 
 const HeroSection: React.FC = () => {
   const [liveData, setLiveData] = useState<{ isLive: boolean; url: string | false }>({ isLive: false, url: false });
+  const [subscriberCount, setSubscriberCount] = useState<number | null>(null);
+
+  // Helper: choisir un objectif 'milestone' attractif en fonction du nombre actuel
+  const getMilestoneGoal = (count: number | null) => {
+    if (!count || count < 10000) return 10000;
+    const milestones = [10000, 25000, 50000, 100000, 250000, 500000, 1000000, 2500000, 5000000, 10000000];
+    for (const m of milestones) if (count < m) return m;
+    return Math.ceil(count / 1000000) * 1000000;
+  };
+
+  const formatNumber = (n: number | null) => (n === null ? "-" : n.toLocaleString("fr-FR"));
 
   useEffect(() => {
     let isMounted = true;
     
     const fetchLiveData = async () => {
       try {
-        const response = await fetch("/.netlify/functions/youtube");
+        // Utiliser le port Netlify Dev en local pour les fonctions
+        const apiUrl = process.env.NODE_ENV === 'development' 
+          ? 'http://localhost:8888/.netlify/functions/youtube'
+          : '/.netlify/functions/youtube';
+        
+        // Ajouter un cache-buster pour éviter les problèmes de cache
+        const urlWithCacheBuster = `${apiUrl}?t=${Date.now()}`;
+        
+        const response = await fetch(urlWithCacheBuster);
         if (!response.ok) {
           console.warn("YouTube API unavailable, using default data");
           return;
@@ -24,15 +43,20 @@ const HeroSection: React.FC = () => {
         const data = await response.json();
         if (isMounted && data.liveData) {
           setLiveData(data.liveData);
+          }
+          // Récupérer le nombre d'abonnés si présent
+          if (isMounted && data.channelData && data.channelData.subscriberCount != null) {
+            const parsed = parseInt(String(data.channelData.subscriberCount), 10);
+            if (!Number.isNaN(parsed)) setSubscriberCount(parsed);
+          }
+        } catch (error) {
+          console.warn("Error fetching live data, using default:", error);
         }
-      } catch (error) {
-        console.warn("Error fetching live data, using default:", error);
-      }
-    };
-
+      };
+  
     // Un seul appel au montage du composant
     fetchLiveData();
-
+  
     return () => {
       isMounted = false;
     };
@@ -137,6 +161,59 @@ const HeroSection: React.FC = () => {
                 <Users className="w-3 h-3 sm:w-4 sm:h-4 text-blue-400" />
                 <span>Communauté active</span>
               </div>
+            </m.div>
+
+            {/* Subscriber progress bar - design attractif */}
+            <m.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.95 }}
+              className="w-full max-w-md mx-auto sm:mx-0"
+            >
+              {/* Calculs dérivés - rendu de la barre de progression */}
+               {
+                 (() => {
+                   const subscriberGoal = getMilestoneGoal(subscriberCount);
+                   const percentage = subscriberCount ? Math.min(100, Math.round((subscriberCount / subscriberGoal) * 100)) : 0;
+                   return (
+                     <div className="bg-white/5 p-3 rounded-xl border border-white/10 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <div>
+                          <div className="text-xs text-gray-300 uppercase tracking-wider">Abonnés</div>
+                          <div className="text-sm font-bold text-white">{formatNumber(subscriberCount)}</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-xs text-gray-400">Objectif : <span className="font-semibold text-white">{formatNumber(subscriberGoal)}</span></div>
+                          <div className="text-sm text-gray-300 font-medium">{percentage}%</div>
+                        </div>
+                      </div>
+
+                      <div className="w-full bg-white/8 h-3 rounded-full overflow-hidden">
+                        <m.div
+                          className="h-full bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500"
+                          initial={{ width: 0 }}
+                          animate={{ width: `${percentage}%` }}
+                          transition={{ duration: 1.2 }}
+                          style={{ width: `${percentage}%` }}
+                        />
+                      </div>
+
+                      <div className="mt-3 flex items-center justify-between">
+                        <a
+                          href="https://www.youtube.com/@Runkko_YT"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-md text-white text-sm font-medium shadow-md"
+                        >
+                          S'abonner
+                          <ExternalLink className="w-3 h-3 opacity-80" />
+                        </a>
+                        <div className="text-xs ml-3 text-gray-400">Chaque abonnement aide à débloquer du contenu exclusif 🔓</div>
+                      </div>
+                    </div>
+                  );
+                })()
+              }
             </m.div>
 
             {/* CTA Buttons */}

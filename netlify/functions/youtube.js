@@ -171,6 +171,29 @@ exports.handler = async function () {
     const statsData = await statsRes.json();
     const stats = statsData.items?.[0];
 
+    // Récupérer le nombre de likes de la vidéo (si disponible)
+    const likeCount = stats?.statistics?.likeCount ?? null;
+
+    // Récupérer le nombre d'abonnés de la chaîne
+    let subscriberCount = null;
+    try {
+      const channelRes = await fetch(
+        `https://www.googleapis.com/youtube/v3/channels?key=${API_KEY}&id=${channelId}&part=statistics`
+      );
+      if (channelRes.ok) {
+        const channelData = await channelRes.json();
+        const channelStats = channelData.items?.[0]?.statistics;
+        subscriberCount = channelStats?.subscriberCount ?? null;
+      } else {
+        const chErr = await channelRes.text();
+        console.warn("Impossible de récupérer les stats de la chaîne :", channelRes.status, chErr);
+        // si quota dépassé on ne marque pas tout le service comme en erreur ici,
+        // on se contente de renvoyer null pour subscriberCount
+      }
+    } catch (e) {
+      console.warn("Erreur lors de la récupération des abonnés :", e.message);
+    }
+
     const videoData = {
       id: videoId,
       title: video.snippet.title,
@@ -183,12 +206,16 @@ exports.handler = async function () {
       publishedAt: video.snippet.publishedAt,
       viewCount: stats?.statistics?.viewCount ?? null,
       duration: stats?.contentDetails?.duration ?? null,
+      likeCount: likeCount,
     };
 
-    // Objet final contenant videoData et liveData
+    // Objet final contenant videoData, liveData et les infos chaîne
     const responsePayload = {
       videoData,
       liveData,
+      channelData: {
+        subscriberCount,
+      },
     };
 
     // Mettre en cache la réponse et reset quota exceeded

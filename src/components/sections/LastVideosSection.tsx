@@ -16,16 +16,31 @@ interface VideoData {
   duration?: string;
 }
 
+interface LiveData {
+  isLive: boolean;
+  url: string | false;
+}
+
 const LastVideosSection: React.FC = () => {
   const [latestVideo, setLatestVideo] = useState<VideoData | null>(null);
+  const [liveData, setLiveData] = useState<LiveData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchLatestVideo = async () => {
-      try {
-        // Appel à la fonction Netlify
-        const response = await fetch(`/.netlify/functions/youtube`);
+      try { 
+        // Utiliser le port Netlify Dev en local pour les fonctions
+        const apiUrl = process.env.NODE_ENV === 'development' 
+          ? 'http://localhost:8888/.netlify/functions/youtube'
+          : '/.netlify/functions/youtube';
+        
+        // Ajouter un cache-buster pour éviter les problèmes de cache
+        const urlWithCacheBuster = `${apiUrl}?t=${Date.now()}`;
+        
+        console.log("Fetching from API:", urlWithCacheBuster);
+        const response = await fetch(urlWithCacheBuster);
+        console.log("Response from Netlify API:", response);
         if (!response.ok) {
           const errData = await response.json();
           setError(
@@ -35,8 +50,23 @@ const LastVideosSection: React.FC = () => {
           return;
         }
         const data = await response.json();
-        const videoData: VideoData = data.videoData;
+        console.log("Full API response:", JSON.stringify(data, null, 2));
+        console.log("data.videoData:", data.videoData);
+        console.log("data.liveData:", data.liveData);
+        const videoData: VideoData | null = data.videoData ?? null;
+        const live: LiveData | null = data.liveData ?? null;
+        console.log("Latest video data:", videoData);
+        console.log("Live data:", live);
+
         setLatestVideo(videoData);
+        setLiveData(live);
+
+        // Si l'API renvoie null pour videoData et il n'y a pas de live, afficher un message clair
+        if (!videoData && (!live || !live.isLive)) {
+          setError("Aucune vidéo disponible pour le moment.");
+        } else {
+          setError(null);
+        }
       } catch (err) {
         setError("Erreur lors du chargement de la vidéo");
         console.error("Erreur Netlify API:", err);
@@ -164,6 +194,31 @@ const LastVideosSection: React.FC = () => {
               </m.button>
             </div>
           </m.div>
+        ) : liveData?.isLive ? (
+          <m.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center py-20"
+          >
+            <div className="bg-green-900/20 backdrop-blur-sm border border-green-500/30 rounded-2xl p-8 max-w-lg mx-auto">
+              <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Play className="w-8 h-8 text-red-400" />
+              </div>
+
+              <h3 className="text-2xl font-semibold text-white mb-2">En direct maintenant</h3>
+              <p className="text-gray-300 mb-6">Un live est en cours sur la chaîne — rejoignez-le maintenant !</p>
+
+              <a
+                href={String(liveData.url)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300"
+              >
+                <Play className="w-4 h-4" /> Voir le live
+              </a>
+            </div>
+          </m.div>
         ) : latestVideo ? (
           <m.div
             initial={{ opacity: 0, y: 50 }}
@@ -267,7 +322,19 @@ const LastVideosSection: React.FC = () => {
               </m.div>
             </div>
           </m.div>
-        ) : null}
+        ) : (
+          <m.div className="text-center py-20 text-gray-400">
+            <p>Aucune vidéo trouvée pour le moment.</p>
+            <m.button
+              onClick={() => window.location.reload()}
+              className="mt-6 inline-flex items-center gap-2 bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+            >
+              Réessayer
+            </m.button>
+          </m.div>
+        )}
       </div>
     </section>
   );
