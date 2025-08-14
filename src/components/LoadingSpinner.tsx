@@ -76,13 +76,16 @@ export default function LoadingSpinner({
 
   if (variant === "secondary") {
     return (
-      <div className={`flex flex-col items-center justify-center ${containerSizes[size]}`}>
-        <m.div
-          className="relative"
-          animate={pulseVariants}
-        >
-          <div className={`${sizeClasses[size]} bg-gradient-to-br from-slate-700 to-slate-800 rounded-full flex items-center justify-center border border-slate-600`}>
-            {showIcon && <Code className={`${iconSizes[size]} text-slate-400`} />}
+      <div
+        className={`flex flex-col items-center justify-center ${containerSizes[size]}`}
+      >
+        <m.div className="relative" animate={pulseVariants}>
+          <div
+            className={`${sizeClasses[size]} bg-gradient-to-br from-slate-700 to-slate-800 rounded-full flex items-center justify-center border border-slate-600`}
+          >
+            {showIcon && (
+              <Code className={`${iconSizes[size]} text-slate-400`} />
+            )}
           </div>
         </m.div>
         {message && (
@@ -96,23 +99,27 @@ export default function LoadingSpinner({
 
   // Primary variant (default)
   return (
-    <div className={`flex flex-col items-center justify-center ${containerSizes[size]}`}>
+    <div
+      className={`flex flex-col items-center justify-center ${containerSizes[size]}`}
+    >
       <div className="relative mb-4">
         {/* Outer ring */}
         <m.div
           className={`${sizeClasses[size]} border-2 border-indigo-500/20 rounded-full`}
           animate={pulseVariants}
         />
-        
+
         {/* Spinning ring */}
         <m.div
           className={`absolute inset-0 ${sizeClasses[size]} border-2 border-transparent border-t-indigo-500 border-r-purple-500 rounded-full`}
           animate={spinVariants}
         />
-        
+
         {/* Center icon */}
         {showIcon && (
-          <div className={`absolute inset-0 ${sizeClasses[size]} flex items-center justify-center`}>
+          <div
+            className={`absolute inset-0 ${sizeClasses[size]} flex items-center justify-center`}
+          >
             <m.div animate={pulseVariants}>
               <Zap className={`${iconSizes[size]} text-indigo-400`} />
             </m.div>
@@ -152,7 +159,7 @@ export function DynamicComponentLoader({
   message?: string;
 }) {
   return (
-    <div 
+    <div
       className="flex items-center justify-center bg-slate-900/50 backdrop-blur-sm border border-slate-800 rounded-lg"
       style={{ height }}
     >
@@ -170,7 +177,7 @@ export function ImageLoader({
   message?: string;
 }) {
   return (
-    <div 
+    <div
       className="flex items-center justify-center bg-slate-900/30 backdrop-blur-sm border border-slate-800 rounded-lg"
       style={{ aspectRatio }}
     >
@@ -188,7 +195,7 @@ export function SectionLoader({
   message?: string;
 }) {
   return (
-    <div 
+    <div
       className="flex items-center justify-center bg-gradient-to-br from-slate-900/20 to-slate-800/20 backdrop-blur-sm border border-slate-800/50 rounded-xl"
       style={{ minHeight }}
     >

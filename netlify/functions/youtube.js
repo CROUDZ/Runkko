@@ -15,28 +15,28 @@ exports.handler = async function () {
 
   // Si quota dépassé récemment, retourner données par défaut pendant 24h
   const now = Date.now();
-  if (cache.quotaExceeded && (now - cache.errorTimestamp) < 24 * 60 * 60 * 1000) {
+  if (cache.quotaExceeded && now - cache.errorTimestamp < 24 * 60 * 60 * 1000) {
     console.log("Quota exceeded recently, returning default data");
     const fallbackData = {
       videoData: null,
-      liveData: { isLive: false, url: false }
+      liveData: { isLive: false, url: false },
     };
     return {
       statusCode: 200,
       headers: {
-        'Cache-Control': 'public, max-age=3600',
+        "Cache-Control": "public, max-age=3600",
       },
       body: JSON.stringify(fallbackData),
     };
   }
 
   // Vérifier le cache d'abord
-  if (cache.data && (now - cache.timestamp) < cache.duration) {
+  if (cache.data && now - cache.timestamp < cache.duration) {
     console.log("Returning cached data");
     return {
       statusCode: 200,
       headers: {
-        'Cache-Control': 'public, max-age=300',
+        "Cache-Control": "public, max-age=300",
       },
       body: JSON.stringify(cache.data),
     };
@@ -71,31 +71,35 @@ exports.handler = async function () {
     // Gérer spécifiquement l'erreur de quota dépassé
     if (!searchRes.ok) {
       const errorBody = await searchRes.text();
-      console.error("Erreur lors de la récupération des vidéos (latest):", searchRes.status, errorBody);
-      
+      console.error(
+        "Erreur lors de la récupération des vidéos (latest):",
+        searchRes.status,
+        errorBody,
+      );
+
       // Gérer spécifiquement l'erreur de quota dépassé
       if (searchRes.status === 403) {
         console.error("QUOTA EXCEEDED - Setting 24h cache");
         const fallbackData = {
           videoData: null,
-          liveData: { isLive: false, url: false }
+          liveData: { isLive: false, url: false },
         };
-        
+
         // Marquer le quota comme dépassé pour 24h
         cache.quotaExceeded = true;
         cache.errorTimestamp = now;
         cache.data = fallbackData;
         cache.timestamp = now;
-        
+
         return {
           statusCode: 200,
           headers: {
-            'Cache-Control': 'public, max-age=86400', // Cache 24 heures
+            "Cache-Control": "public, max-age=86400", // Cache 24 heures
           },
           body: JSON.stringify(fallbackData),
         };
       }
-      
+
       return {
         statusCode: 500,
         body: JSON.stringify({
@@ -105,11 +109,15 @@ exports.handler = async function () {
         }),
       };
     }
-    
+
     if (!liveRes.ok) {
       const errorBody = await liveRes.text();
-      console.error("Erreur lors de la vérification du live:", liveRes.status, errorBody);
-      
+      console.error(
+        "Erreur lors de la vérification du live:",
+        liveRes.status,
+        errorBody,
+      );
+
       // Si quota dépassé pour le live, continuer avec juste les données de vidéo
       if (liveRes.status === 403) {
         console.log("Quota dépassé pour le live check, on continue sans");
@@ -127,7 +135,7 @@ exports.handler = async function () {
 
     const searchData = await searchRes.json();
     let liveDataRaw = null;
-    
+
     // Essayer de récupérer les données live seulement si la requête a réussi
     if (liveRes.ok) {
       liveDataRaw = await liveRes.json();
@@ -162,11 +170,14 @@ exports.handler = async function () {
 
     // Récupérer les statistiques et contentDetails de la vidéo
     const statsRes = await fetch(
-      `https://www.googleapis.com/youtube/v3/videos?key=${API_KEY}&id=${videoId}&part=statistics,contentDetails`
+      `https://www.googleapis.com/youtube/v3/videos?key=${API_KEY}&id=${videoId}&part=statistics,contentDetails`,
     );
     if (!statsRes.ok) {
       // On ne plante pas complètement : on renvoie la vidéo sans stats si l'API stats échoue
-      console.warn("Impossible de récupérer les stats de la vidéo :", await statsRes.text());
+      console.warn(
+        "Impossible de récupérer les stats de la vidéo :",
+        await statsRes.text(),
+      );
     }
     const statsData = await statsRes.json();
     const stats = statsData.items?.[0];
@@ -178,7 +189,7 @@ exports.handler = async function () {
     let subscriberCount = null;
     try {
       const channelRes = await fetch(
-        `https://www.googleapis.com/youtube/v3/channels?key=${API_KEY}&id=${channelId}&part=statistics`
+        `https://www.googleapis.com/youtube/v3/channels?key=${API_KEY}&id=${channelId}&part=statistics`,
       );
       if (channelRes.ok) {
         const channelData = await channelRes.json();
@@ -186,7 +197,11 @@ exports.handler = async function () {
         subscriberCount = channelStats?.subscriberCount ?? null;
       } else {
         const chErr = await channelRes.text();
-        console.warn("Impossible de récupérer les stats de la chaîne :", channelRes.status, chErr);
+        console.warn(
+          "Impossible de récupérer les stats de la chaîne :",
+          channelRes.status,
+          chErr,
+        );
         // si quota dépassé on ne marque pas tout le service comme en erreur ici,
         // on se contente de renvoyer null pour subscriberCount
       }
@@ -228,7 +243,7 @@ exports.handler = async function () {
     return {
       statusCode: 200,
       headers: {
-        'Cache-Control': 'public, max-age=300', // Cache côté client de 5 minutes
+        "Cache-Control": "public, max-age=300", // Cache côté client de 5 minutes
       },
       body: JSON.stringify(responsePayload),
     };

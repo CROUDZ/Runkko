@@ -65,19 +65,16 @@ export default function Loading() {
         {/* Main Loading Animation */}
         <div className="mb-8 relative">
           {/* Outer Ring */}
-          <m.div
-            className="w-32 h-32 mx-auto relative"
-            animate={pulseVariants}
-          >
+          <m.div className="w-32 h-32 mx-auto relative" animate={pulseVariants}>
             <div className="absolute inset-0 border-4 border-indigo-500/20 rounded-full"></div>
             <div className="absolute inset-2 border-2 border-purple-500/30 rounded-full"></div>
-            
+
             {/* Spinning Elements */}
             <m.div
               className="absolute inset-4 border-2 border-transparent border-t-indigo-500 border-r-purple-500 rounded-full"
               animate={spinVariants}
             ></m.div>
-            
+
             {/* Center Icon */}
             <div className="absolute inset-0 flex items-center justify-center">
               <m.div animate={floatVariants}>
@@ -109,7 +106,7 @@ export default function Loading() {
           <h2 className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
             Chargement en cours
           </h2>
-          
+
           {/* Animated Dots */}
           <div className="flex justify-center items-center gap-1">
             {[0, 1, 2].map((i) => (

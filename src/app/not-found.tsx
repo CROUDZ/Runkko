@@ -1,8 +1,8 @@
 "use client";
 
-import Link from 'next/link';
-import { m } from 'framer-motion';
-import { Home, ArrowLeft, Search, MapPin } from 'lucide-react';
+import Link from "next/link";
+import { m } from "framer-motion";
+import { Home, ArrowLeft, Search, MapPin } from "lucide-react";
 
 export default function NotFound() {
   const containerVariants = {
@@ -78,8 +78,9 @@ export default function NotFound() {
             Houston, nous avons un problème !
           </h2>
           <p className="text-lg sm:text-xl text-slate-400 mb-8 max-w-2xl mx-auto leading-relaxed">
-            La page que vous recherchez semble s'être perdue dans l'espace numérique. 
-            Ne vous inquiétez pas, nous allons vous ramener en territoire connu.
+            La page que vous recherchez semble s'être perdue dans l'espace
+            numérique. Ne vous inquiétez pas, nous allons vous ramener en
+            territoire connu.
           </p>
         </m.div>
 
@@ -88,10 +89,7 @@ export default function NotFound() {
           variants={itemVariants}
           className="flex flex-col sm:flex-row gap-4 justify-center items-center"
         >
-          <m.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
+          <m.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Link
               href="/"
               className="inline-flex items-center gap-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-indigo-500/25 group"

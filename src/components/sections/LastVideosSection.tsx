@@ -1,82 +1,24 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Image from "next/image";
 import { m } from "framer-motion";
-import { Play, Calendar, Eye, ExternalLink, AlertTriangle, RefreshCw } from "lucide-react";
+import {
+  Play,
+  Calendar,
+  Eye,
+  ExternalLink,
+  AlertTriangle,
+  RefreshCw,
+} from "lucide-react";
 import LoadingSpinner from "../LoadingSpinner";
-
-interface VideoData {
-  id: string;
-  title: string;
-  description: string;
-  thumbnail: string;
-  publishedAt: string;
-  viewCount?: string;
-  duration?: string;
-}
-
-interface LiveData {
-  isLive: boolean;
-  url: string | false;
-}
+import { useYouTube } from "@/contexts/YouTubeContext";
 
 const LastVideosSection: React.FC = () => {
-  const [latestVideo, setLatestVideo] = useState<VideoData | null>(null);
-  const [liveData, setLiveData] = useState<LiveData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data, loading, error, refetch } = useYouTube();
 
-  useEffect(() => {
-    const fetchLatestVideo = async () => {
-      try { 
-        // Utiliser le port Netlify Dev en local pour les fonctions
-        const apiUrl = process.env.NODE_ENV === 'development' 
-          ? 'http://localhost:8888/.netlify/functions/youtube'
-          : '/.netlify/functions/youtube';
-        
-        // Ajouter un cache-buster pour éviter les problèmes de cache
-        const urlWithCacheBuster = `${apiUrl}?t=${Date.now()}`;
-        
-        console.log("Fetching from API:", urlWithCacheBuster);
-        const response = await fetch(urlWithCacheBuster);
-        console.log("Response from Netlify API:", response);
-        if (!response.ok) {
-          const errData = await response.json();
-          setError(
-            errData.error || "Erreur lors de la récupération des vidéos",
-          );
-          setLoading(false);
-          return;
-        }
-        const data = await response.json();
-        console.log("Full API response:", JSON.stringify(data, null, 2));
-        console.log("data.videoData:", data.videoData);
-        console.log("data.liveData:", data.liveData);
-        const videoData: VideoData | null = data.videoData ?? null;
-        const live: LiveData | null = data.liveData ?? null;
-        console.log("Latest video data:", videoData);
-        console.log("Live data:", live);
-
-        setLatestVideo(videoData);
-        setLiveData(live);
-
-        // Si l'API renvoie null pour videoData et il n'y a pas de live, afficher un message clair
-        if (!videoData && (!live || !live.isLive)) {
-          setError("Aucune vidéo disponible pour le moment.");
-        } else {
-          setError(null);
-        }
-      } catch (err) {
-        setError("Erreur lors du chargement de la vidéo");
-        console.error("Erreur Netlify API:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchLatestVideo();
-  }, []);
+  const latestVideo = data?.videoData;
+  const liveData = data?.liveData;
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -154,7 +96,7 @@ const LastVideosSection: React.FC = () => {
             animate={{ opacity: 1 }}
             className="flex justify-center items-center py-20"
           >
-            <LoadingSpinner 
+            <LoadingSpinner
               size="lg"
               message="Chargement de la dernière vidéo..."
             />
@@ -170,21 +112,19 @@ const LastVideosSection: React.FC = () => {
               <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
                 <AlertTriangle className="w-8 h-8 text-red-400" />
               </div>
-              
+
               <h3 className="text-xl font-semibold text-red-300 mb-4">
                 Erreur de chargement
               </h3>
-              
-              <p className="text-red-400 mb-6">
-                {error}
-              </p>
-              
+
+              <p className="text-red-400 mb-6">{error}</p>
+
               <p className="text-gray-400 text-sm mb-8">
                 Vérifiez votre connexion internet ou réessayez plus tard.
               </p>
 
               <m.button
-                onClick={() => window.location.reload()}
+                onClick={refetch}
                 className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 group"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -206,8 +146,12 @@ const LastVideosSection: React.FC = () => {
                 <Play className="w-8 h-8 text-red-400" />
               </div>
 
-              <h3 className="text-2xl font-semibold text-white mb-2">En direct maintenant</h3>
-              <p className="text-gray-300 mb-6">Un live est en cours sur la chaîne — rejoignez-le maintenant !</p>
+              <h3 className="text-2xl font-semibold text-white mb-2">
+                En direct maintenant
+              </h3>
+              <p className="text-gray-300 mb-6">
+                Un live est en cours sur la chaîne — rejoignez-le maintenant !
+              </p>
 
               <a
                 href={String(liveData.url)}
@@ -326,7 +270,7 @@ const LastVideosSection: React.FC = () => {
           <m.div className="text-center py-20 text-gray-400">
             <p>Aucune vidéo trouvée pour le moment.</p>
             <m.button
-              onClick={() => window.location.reload()}
+              onClick={refetch}
               className="mt-6 inline-flex items-center gap-2 bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300"
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}

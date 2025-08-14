@@ -65,14 +65,8 @@ export default function Error({
         animate="visible"
       >
         {/* Error Icon */}
-        <m.div
-          variants={itemVariants}
-          className="mb-8 flex justify-center"
-        >
-          <m.div
-            className="relative"
-            animate={pulseVariants}
-          >
+        <m.div variants={itemVariants} className="mb-8 flex justify-center">
+          <m.div className="relative" animate={pulseVariants}>
             <div className="w-32 h-32 bg-gradient-to-br from-red-500 to-orange-500 rounded-full flex items-center justify-center shadow-2xl">
               <AlertTriangle className="w-16 h-16 text-white" />
             </div>
@@ -102,7 +96,8 @@ export default function Error({
                 Détails de l'erreur
               </h3>
               <p className="text-slate-400 text-sm break-words">
-                {error.message || "Une erreur inattendue s'est produite. Nos équipes ont été notifiées."}
+                {error.message ||
+                  "Une erreur inattendue s'est produite. Nos équipes ont été notifiées."}
               </p>
             </div>
           </div>
@@ -123,10 +118,7 @@ export default function Error({
             Réessayer
           </m.button>
 
-          <m.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
+          <m.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Link
               href="/"
               className="inline-flex items-center gap-3 bg-slate-800/50 backdrop-blur-sm border border-slate-700 text-slate-300 px-8 py-4 rounded-xl font-semibold hover:bg-slate-700/50 hover:text-slate-100 transition-all duration-300 group"
@@ -148,16 +140,13 @@ export default function Error({
         </m.div>
 
         {/* Help Text */}
-        <m.div
-          variants={itemVariants}
-          className="mt-16 text-slate-500 text-sm"
-        >
+        <m.div variants={itemVariants} className="mt-16 text-slate-500 text-sm">
           <p>
             Si le problème persiste, veuillez{" "}
             <button className="text-red-400 hover:text-red-300 underline transition-colors">
               nous contacter
-            </button>
-            {" "}en décrivant ce que vous faisiez lorsque l'erreur s'est produite.
+            </button>{" "}
+            en décrivant ce que vous faisiez lorsque l'erreur s'est produite.
           </p>
         </m.div>
       </m.div>

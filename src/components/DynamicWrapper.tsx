@@ -5,10 +5,10 @@ import { ComponentType } from "react";
 import LoadingSpinner, { DynamicComponentLoader } from "./LoadingSpinner";
 
 // Composant de skeleton pour une meilleure UX
-export function ComponentSkeleton({ 
+export function ComponentSkeleton({
   minHeight = "300px",
-  showPulse = true 
-}: { 
+  showPulse = true,
+}: {
   minHeight?: string;
   showPulse?: boolean;
 }) {
@@ -22,7 +22,7 @@ export function ComponentSkeleton({
   };
 
   return (
-    <m.div 
+    <m.div
       className="bg-slate-900/30 backdrop-blur-sm border border-slate-800/50 rounded-xl p-6 space-y-4"
       style={{ minHeight }}
       initial={{ opacity: 0 }}
@@ -31,11 +31,11 @@ export function ComponentSkeleton({
     >
       {/* Header skeleton */}
       <div className="space-y-3">
-        <m.div 
+        <m.div
           className="h-8 bg-slate-700/50 rounded-lg w-3/4"
           animate={showPulse ? pulseVariants : {}}
         />
-        <m.div 
+        <m.div
           className="h-4 bg-slate-700/30 rounded w-1/2"
           animate={showPulse ? pulseVariants : {}}
           transition={{ delay: 0.1 }}
@@ -56,7 +56,7 @@ export function ComponentSkeleton({
       </div>
 
       {/* Button skeleton */}
-      <m.div 
+      <m.div
         className="h-10 bg-slate-700/40 rounded-lg w-32 mt-6"
         animate={showPulse ? pulseVariants : {}}
         transition={{ delay: 0.5 }}
@@ -66,11 +66,11 @@ export function ComponentSkeleton({
 }
 
 // Composant d'erreur pour les composants dynamiques
-export function DynamicError({ 
-  error, 
-  retry 
-}: { 
-  error: Error; 
+export function DynamicError({
+  error,
+  retry,
+}: {
+  error: Error;
   retry: () => void;
 }) {
   return (
@@ -95,23 +95,33 @@ export function DynamicError({
           />
         </svg>
       </div>
-      
+
       <h3 className="text-lg font-semibold text-slate-200 mb-2">
         Erreur de chargement
       </h3>
-      
+
       <p className="text-slate-400 text-sm mb-6 max-w-md">
         {error.message || "Impossible de charger ce composant."}
       </p>
-      
+
       <m.button
         onClick={retry}
         className="inline-flex items-center gap-2 bg-red-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-red-700 transition-colors duration-200"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        <svg
+          className="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+          />
         </svg>
         Réessayer
       </m.button>
@@ -127,13 +137,13 @@ export function withDynamicLoading<T extends Record<string, unknown>>(
     minHeight?: string;
     showSkeleton?: boolean;
     fallback?: React.ReactNode;
-  } = {}
+  } = {},
 ) {
   const {
     loadingMessage = "Chargement du composant...",
     minHeight = "300px",
     showSkeleton = false,
-    fallback
+    fallback,
   } = options;
 
   return function DynamicWrapper() {
@@ -146,10 +156,7 @@ export function withDynamicLoading<T extends Record<string, unknown>>(
     }
 
     return (
-      <DynamicComponentLoader 
-        height={minHeight} 
-        message={loadingMessage} 
-      />
+      <DynamicComponentLoader height={minHeight} message={loadingMessage} />
     );
   };
 }

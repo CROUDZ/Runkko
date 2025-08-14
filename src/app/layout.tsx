@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "@/styles/globals.css";
 import MotionProvider from "@/components/MotionProvider";
+import { YouTubeProvider } from "@/contexts/YouTubeContext";
 
 export const metadata: Metadata = {
   title: "Runkko - Le YouTuber à découvrir !",
@@ -22,7 +23,9 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.webp" type="image/webp" />
       </head>
       <body>
-        <MotionProvider>{children}</MotionProvider>
+        <MotionProvider>
+          <YouTubeProvider>{children}</YouTubeProvider>
+        </MotionProvider>
       </body>
     </html>
   );
