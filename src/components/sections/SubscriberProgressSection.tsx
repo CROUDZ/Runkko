@@ -35,6 +35,34 @@ const SubscriberProgressSection: React.FC = () => {
     }
   }, [data?.channelData?.subscriberCount]);
 
+  // Vérifier au montage si on est dans une période de célébration
+  useEffect(() => {
+    if (subscriberCount != null) {
+      const milestones = [10, 50, 100, 1000, 10000, 100000, 1000000];
+
+      // Trouver le dernier milestone atteint
+      const lastReachedMilestone = milestones
+        .filter((milestone) => subscriberCount >= milestone)
+        .pop();
+
+      if (lastReachedMilestone) {
+        const threshold = Math.ceil(lastReachedMilestone * 1.05);
+        console.log(
+          `Checking if in celebration period: milestone ${lastReachedMilestone}, current ${subscriberCount}, threshold ${threshold}`,
+        );
+
+        // Si on est encore dans la période de 5% après le milestone
+        if (subscriberCount <= threshold) {
+          console.log(
+            `Starting celebration for milestone ${lastReachedMilestone}`,
+          );
+          setLastMilestone(lastReachedMilestone);
+          setShowCelebration(true);
+        }
+      }
+    }
+  }, [subscriberCount]);
+
   // Helper: choisir un objectif 'milestone' attractif en fonction du nombre actuel
   const getMilestoneGoal = (count: number | null) => {
     if (!count || count < 10) return 10;
@@ -120,8 +148,18 @@ const SubscriberProgressSection: React.FC = () => {
     if (!showCelebration || lastMilestone == null || subscriberCount == null)
       return;
 
+    // Calculer le seuil de 5% au-dessus du milestone (arrondi vers le haut)
     const threshold = Math.ceil(lastMilestone * 1.05);
-    if (subscriberCount >= threshold) {
+
+    // Debug logs (à retirer en production)
+    console.log(`Celebration active for milestone ${lastMilestone}`);
+    console.log(
+      `Current subscribers: ${subscriberCount}, threshold: ${threshold}`,
+    );
+
+    // Arrêter la célébration seulement quand on DÉPASSE le seuil
+    if (subscriberCount > threshold) {
+      console.log("Stopping celebration");
       setShowCelebration(false);
     }
   }, [subscriberCount, lastMilestone, showCelebration]);
@@ -186,6 +224,65 @@ const SubscriberProgressSection: React.FC = () => {
           </p>
         </m.div>
 
+        {/* Bannière de célébration (non intrusive) */}
+        <AnimatePresence>
+          {showCelebration && lastMilestone && (
+            <m.div
+              initial={{ opacity: 0, y: -50, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -50, scale: 0.9 }}
+              className="max-w-4xl mx-auto mb-6"
+            >
+              <div className="bg-gradient-to-r from-yellow-400/20 via-red-500/20 to-pink-500/20 backdrop-blur-xl border border-yellow-400/30 rounded-xl p-4 text-center relative overflow-hidden">
+                {/* Effet de brillance qui passe */}
+                <m.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
+                  animate={{ x: ["-100%", "200%"] }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                />
+
+                <div className="relative z-10 flex items-center justify-center gap-3">
+                  <m.span
+                    animate={{ rotate: [0, 10, -10, 0] }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                    className="text-2xl"
+                  >
+                    🎉
+                  </m.span>
+                  <div>
+                    <h3 className="text-lg font-bold text-white">
+                      Milestone atteint ! 🚀
+                    </h3>
+                    <p className="text-yellow-200">
+                      {formatNumber(lastMilestone)} abonnés - Merci pour votre
+                      soutien ! 💖
+                    </p>
+                  </div>
+                  <m.span
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                    className="text-2xl"
+                  >
+                    ✨
+                  </m.span>
+                </div>
+              </div>
+            </m.div>
+          )}
+        </AnimatePresence>
+
         {/* Carte principale de progression */}
         <m.div
           initial={{ opacity: 0, y: 50 }}
@@ -194,15 +291,36 @@ const SubscriberProgressSection: React.FC = () => {
           viewport={{ once: true }}
           className="max-w-4xl mx-auto"
         >
-          <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl p-6 sm:p-8 rounded-2xl border border-white/20 shadow-2xl">
+          <div
+            className={`bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl p-6 sm:p-8 rounded-2xl border shadow-2xl transition-all duration-500 ${
+              showCelebration
+                ? "border-yellow-400/50 shadow-yellow-400/20"
+                : "border-white/20"
+            }`}
+          >
             {/* Header avec stats */}
             <div className="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
               <div className="text-center sm:text-left">
                 <div className="flex items-center gap-2 text-gray-400 text-sm uppercase tracking-wider mb-2">
                   <Users className="w-4 h-4" />
                   Abonnés YouTube
+                  {showCelebration && (
+                    <m.span
+                      animate={{ scale: [1, 1.3, 1] }}
+                      transition={{ duration: 1, repeat: Infinity }}
+                      className="ml-1"
+                    >
+                      🎉
+                    </m.span>
+                  )}
                 </div>
-                <div className="text-4xl sm:text-5xl font-bold text-white">
+                <div
+                  className={`text-4xl sm:text-5xl font-bold transition-all duration-500 ${
+                    showCelebration
+                      ? "text-yellow-300 drop-shadow-lg"
+                      : "text-white"
+                  }`}
+                >
                   {formatNumber(subscriberCount)}
                 </div>
               </div>
@@ -233,7 +351,11 @@ const SubscriberProgressSection: React.FC = () => {
               <div className="relative w-full h-4 bg-white/10 rounded-full overflow-hidden">
                 {/* Barre de progression avec gradient animé */}
                 <m.div
-                  className="h-full bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500 relative"
+                  className={`h-full relative transition-all duration-500 ${
+                    showCelebration
+                      ? "bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-500"
+                      : "bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500"
+                  }`}
                   initial={{ width: 0 }}
                   whileInView={{ width: `${percentage}%` }}
                   transition={{ duration: 2, ease: "easeInOut" }}
@@ -245,6 +367,30 @@ const SubscriberProgressSection: React.FC = () => {
                     animate={{ x: ["-100%", "100%"] }}
                     transition={{ duration: 2, delay: 1, ease: "easeInOut" }}
                   />
+
+                  {/* Particules de célébration sur la barre */}
+                  {showCelebration &&
+                    [...Array(5)].map((_, i) => (
+                      <m.div
+                        key={i}
+                        className="absolute w-1 h-1 bg-white rounded-full"
+                        animate={{
+                          y: [-2, -8, -2],
+                          opacity: [0, 1, 0],
+                          scale: [0, 1, 0],
+                        }}
+                        transition={{
+                          duration: 2,
+                          delay: i * 0.2,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                        }}
+                        style={{
+                          left: `${20 + i * 15}%`,
+                          top: "50%",
+                        }}
+                      />
+                    ))}
                 </m.div>
 
                 {/* Points de milestone sur la barre */}
@@ -302,71 +448,7 @@ const SubscriberProgressSection: React.FC = () => {
         </m.div>
       </div>
 
-      {/* Animation de célébration pour les milestones */}
-      <AnimatePresence>
-        {showCelebration && lastMilestone && (
-          <m.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-          >
-            <m.div
-              initial={{ scale: 0, rotate: -180 }}
-              animate={{ scale: 1, rotate: 0 }}
-              exit={{ scale: 0, rotate: 180 }}
-              transition={{ type: "spring", damping: 15 }}
-              className="bg-gradient-to-br from-yellow-400 to-red-500 p-8 rounded-2xl text-center max-w-md mx-4"
-            >
-              <m.div
-                animate={{ rotate: [0, 360] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                className="text-6xl mb-4"
-              >
-                🎉
-              </m.div>
-              <h3 className="text-2xl font-bold text-white mb-2">
-                Nouveau milestone !
-              </h3>
-              <p className="text-lg text-white/90 mb-4">
-                🚀 {formatNumber(lastMilestone)} abonnés atteints !
-              </p>
-              <p className="text-white/80">
-                Merci pour votre soutien incroyable ! 💖
-              </p>
-
-              {/* Confettis animés */}
-              {[...Array(20)].map((_, i) => (
-                <m.div
-                  key={i}
-                  className="absolute w-2 h-2 bg-white rounded-full"
-                  initial={{
-                    x: 0,
-                    y: 0,
-                    opacity: 1,
-                    scale: 1,
-                  }}
-                  animate={{
-                    x: (Math.random() - 0.5) * 400,
-                    y: Math.random() * 300 + 100,
-                    opacity: 0,
-                    scale: 0,
-                  }}
-                  transition={{
-                    duration: 2,
-                    delay: i * 0.1,
-                    ease: "easeOut",
-                  }}
-                  style={{
-                    left: "50%",
-                    top: "50%",
-                  }}
-                />
-              ))}
-            </m.div>
-          </m.div>
-        )}
-      </AnimatePresence>
+      {/* Animation de célébration supprimée - remplacée par la bannière ci-dessus */}
     </section>
   );
 };

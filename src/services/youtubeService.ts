@@ -2,10 +2,11 @@ interface VideoData {
   id: string;
   title: string;
   description: string;
-  thumbnail: string;
+  thumbnail: string | null;
   publishedAt: string;
-  viewCount?: string;
-  duration?: string;
+  viewCount?: string | null;
+  duration?: string | null;
+  likeCount?: string | null;
 }
 
 interface LiveData {
@@ -14,7 +15,7 @@ interface LiveData {
 }
 
 interface ChannelData {
-  subscriberCount: number;
+  subscriberCount: number | null;
 }
 
 export interface YouTubeData {
@@ -26,8 +27,10 @@ export interface YouTubeData {
 
 class YouTubeService {
   private cache: YouTubeData | null = null;
-  private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes en millisecondes
+  private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
   private fetchPromise: Promise<YouTubeData> | null = null;
+  private lastErrorTimestamp: number | null = null;
+  private readonly ERROR_COOLDOWN = this.CACHE_DURATION; // cooldown après erreur
 
   private getApiUrl(): string {
     return process.env.NODE_ENV === "development"
@@ -35,21 +38,28 @@ class YouTubeService {
       : "/.netlify/functions/youtube";
   }
 
+  private createFallback(): YouTubeData {
+    return {
+      videoData: null,
+      liveData: { isLive: false, url: false },
+      channelData: null,
+      lastFetched: Date.now(),
+    };
+  }
+
   private async fetchFromAPI(): Promise<YouTubeData> {
     try {
       const apiUrl = this.getApiUrl();
       const urlWithCacheBuster = `${apiUrl}?t=${Date.now()}`;
-
       console.log("Fetching YouTube data from API:", urlWithCacheBuster);
       const response = await fetch(urlWithCacheBuster);
 
       if (!response.ok) {
-        const errData = await response
+        // try parse body for debug
+        const errBody = await response
           .json()
           .catch(() => ({ error: "Erreur réseau" }));
-        throw new Error(
-          errData.error || "Erreur lors de la récupération des données YouTube",
-        );
+        throw new Error(errBody.error || `HTTP ${response.status}`);
       }
 
       const data = await response.json();
@@ -64,49 +74,71 @@ class YouTubeService {
 
       // Mettre en cache les données
       this.cache = result;
+      this.lastErrorTimestamp = null;
       console.log("YouTube data cached successfully");
 
       return result;
     } catch (error) {
       console.error("YouTube API error:", error);
+      // Negative cache : empêcher de retenter immédiatement si l'API répond mal
+      const fallback = this.createFallback();
+      this.cache = fallback;
+      this.lastErrorTimestamp = Date.now();
+
+      // Rethrow pour que l'appelant sache qu'il y a eu une erreur,
+      // mais la cache contient une réponse fallback utilisable.
       throw error;
     }
   }
 
   public async getData(forceRefresh = false): Promise<YouTubeData> {
-    // Si on a une requête en cours, l'attendre
+    // Si fetch en cours, attendre
     if (this.fetchPromise) {
       return this.fetchPromise;
     }
 
-    // Vérifier le cache si on ne force pas le refresh
+    const now = Date.now();
+
+    // Si cache valide et non forcé, retourner cache
     if (!forceRefresh && this.cache) {
-      const cacheAge = Date.now() - this.cache.lastFetched;
-      if (cacheAge < this.CACHE_DURATION) {
+      const age = now - this.cache.lastFetched;
+      if (age < this.CACHE_DURATION) {
         console.log(
           "Using cached YouTube data, age:",
-          Math.round(cacheAge / 1000),
-          "seconds",
+          Math.round(age / 1000),
+          "s",
         );
         return this.cache;
       }
     }
 
-    // Créer une nouvelle promesse de fetch
+    // Si pas de cache, mais erreur récente, renvoyer fallback sans re-fetch
+    if (!forceRefresh && !this.cache && this.lastErrorTimestamp) {
+      if (now - this.lastErrorTimestamp < this.ERROR_COOLDOWN) {
+        console.warn(
+          "Recent error - returning fallback cached data to avoid retry storm",
+        );
+        // On crée un fallback si nécessaire
+        const fallback = this.createFallback();
+        this.cache = fallback;
+        return fallback;
+      }
+    }
+
+    // Lancer fetch (protégé par fetchPromise)
     this.fetchPromise = this.fetchFromAPI();
 
     try {
       const result = await this.fetchPromise;
       return result;
     } catch (error) {
-      // En cas d'erreur, retourner le cache si disponible
+      // En cas d'erreur, retourner le cache fallback si disponible
       if (this.cache) {
-        console.warn("API failed, using cached data");
+        console.warn("API failed, returning cached/fallback data");
         return this.cache;
       }
       throw error;
     } finally {
-      // Réinitialiser la promesse
       this.fetchPromise = null;
     }
   }
@@ -117,8 +149,8 @@ class YouTubeService {
 
   public clearCache(): void {
     this.cache = null;
+    this.lastErrorTimestamp = null;
   }
 }
 
-// Instance singleton
 export const youtubeService = new YouTubeService();

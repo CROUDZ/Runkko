@@ -6,6 +6,7 @@ import React, {
   useEffect,
   useState,
   ReactNode,
+  useRef,
 } from "react";
 import { YouTubeData, youtubeService } from "@/services/youtubeService";
 
@@ -28,6 +29,7 @@ export const useYouTube = (): YouTubeContextType => {
 
 interface YouTubeProviderProps {
   children: ReactNode;
+  // si tu veux réactiver le polling, tu peux exposer un prop pollIntervalMs?: number
 }
 
 export const YouTubeProvider: React.FC<YouTubeProviderProps> = ({
@@ -37,6 +39,9 @@ export const YouTubeProvider: React.FC<YouTubeProviderProps> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // empêche double fetch en dev (React Strict Mode) ou double mount
+  const didFetchRef = useRef(false);
+
   const fetchData = async (forceRefresh = false) => {
     try {
       setLoading(true);
@@ -45,7 +50,6 @@ export const YouTubeProvider: React.FC<YouTubeProviderProps> = ({
       const result = await youtubeService.getData(forceRefresh);
       setData(result);
 
-      // Vérifier si on a des données valides
       if (
         !result.videoData &&
         (!result.liveData || !result.liveData.isLive) &&
@@ -61,7 +65,7 @@ export const YouTubeProvider: React.FC<YouTubeProviderProps> = ({
       setError(errorMessage);
       console.error("YouTube data fetch error:", err);
 
-      // Essayer d'utiliser les données en cache en cas d'erreur
+      // essayer d'utiliser les données en cache si disponibles
       const cachedData = youtubeService.getCachedData();
       if (cachedData) {
         setData(cachedData);
@@ -77,20 +81,14 @@ export const YouTubeProvider: React.FC<YouTubeProviderProps> = ({
   };
 
   useEffect(() => {
-    // Charger les données au montage
+    // éviter double fetch en dev / double mount
+    if (didFetchRef.current) return;
+    didFetchRef.current = true;
+
     fetchData();
 
-    // Actualiser toutes les 5 minutes
-    const interval = setInterval(
-      () => {
-        fetchData();
-      },
-      5 * 60 * 1000,
-    );
-
-    return () => {
-      clearInterval(interval);
-    };
+    // NOTE : j'ai enlevé le setInterval pour respecter "une requête par chargement de page".
+    // Si tu veux un refresh automatique, tu peux rajouter ici un interval configurable.
   }, []);
 
   const contextValue: YouTubeContextType = {

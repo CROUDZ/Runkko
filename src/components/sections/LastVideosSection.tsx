@@ -102,30 +102,23 @@ const LastVideosSection: React.FC = () => {
             />
           </m.div>
         ) : error ? (
-          <m.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="text-center py-20"
-          >
-            <div className="bg-red-900/20 backdrop-blur-sm border border-red-500/30 rounded-2xl p-8 max-w-lg mx-auto">
-              <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+          <footer className="fixed bottom-0 left-0 w-full bg-red-900/80 backdrop-blur-md border-t border-red-500/30 z-50">
+            <div className="flex flex-col md:flex-row items-center justify-between max-w-4xl mx-auto py-4 px-6">
+              <div className="flex items-center gap-4">
                 <AlertTriangle className="w-8 h-8 text-red-400" />
+                <div>
+                  <span className="text-red-300 font-semibold text-lg">
+                    Erreur de chargement
+                  </span>
+                  <p className="text-red-400 text-sm">{error}</p>
+                  <p className="text-gray-400 text-xs">
+                    Vérifiez votre connexion internet ou réessayez plus tard.
+                  </p>
+                </div>
               </div>
-
-              <h3 className="text-xl font-semibold text-red-300 mb-4">
-                Erreur de chargement
-              </h3>
-
-              <p className="text-red-400 mb-6">{error}</p>
-
-              <p className="text-gray-400 text-sm mb-8">
-                Vérifiez votre connexion internet ou réessayez plus tard.
-              </p>
-
               <m.button
                 onClick={refetch}
-                className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 group"
+                className="mt-4 md:mt-0 inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 group"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -133,7 +126,7 @@ const LastVideosSection: React.FC = () => {
                 Réessayer
               </m.button>
             </div>
-          </m.div>
+          </footer>
         ) : liveData?.isLive ? (
           <m.div
             initial={{ opacity: 0, y: 20 }}
@@ -185,7 +178,7 @@ const LastVideosSection: React.FC = () => {
                 >
                   <div className="relative overflow-hidden rounded-2xl shadow-2xl">
                     <Image
-                      src={latestVideo.thumbnail}
+                      src={latestVideo.thumbnail || ""}
                       alt={latestVideo.title}
                       width={800}
                       height={450}

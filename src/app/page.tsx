@@ -2,25 +2,39 @@
 
 import dynamic from "next/dynamic";
 import Head from "next/head";
+import SectionLoader from "@/components/LoadingSpinner";
 
 const Header = dynamic(() => import("@/components/Header"), {
   ssr: false,
+  loading: () => <SectionLoader message="Chargement de l'en-tête..." />,
 });
 const HeroSection = dynamic(() => import("@/components/sections/HeroSection"), {
   ssr: false,
+  loading: () => <SectionLoader message="Chargement de la section héro..." />,
 });
 const SubscriberProgressSection = dynamic(
   () => import("@/components/sections/SubscriberProgressSection"),
   {
     ssr: false,
+    loading: () => (
+      <SectionLoader message="Chargement de la section d'avancement des abonnés..." />
+    ),
   },
 );
 const LastVideosSection = dynamic(
   () => import("@/components/sections/LastVideosSection"),
   {
     ssr: false,
+    loading: () => (
+      <SectionLoader message="Chargement de la section des dernières vidéos..." />
+    ),
   },
 );
+
+const Footer = dynamic(() => import("@/components/Footer"), {
+  ssr: false,
+  loading: () => <SectionLoader message="Chargement du pied de page..." />,
+});
 
 export default function Home() {
   return (
@@ -80,6 +94,7 @@ export default function Home() {
         <SubscriberProgressSection />
         <LastVideosSection />
       </div>
+      <Footer />
     </>
   );
 }
