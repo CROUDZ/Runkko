@@ -40,53 +40,53 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Este_YTB - Le YouTuber à découvrir !</title>
+        <title>Runkko - Le YouTuber à découvrir !</title>
 
         <link rel="icon" href="/favicon.webp" type="image/webp" />
 
         <meta
           name="description"
-          content="Découvrez Este_YTB, le YouTuber à suivre absolument ! Profitez de ses contenus exclusifs sur la plateforme vidéo innovante Este_YTB."
+          content="Découvrez Runkko, le YouTuber à suivre absolument ! Profitez de ses contenus exclusifs sur la plateforme vidéo innovante Runkko."
         />
         <meta
           name="keywords"
-          content="Este_YTB, YouTuber, vidéos, influenceur, exclusif, publicité, streaming, tendances"
+          content="Runkko, YouTuber, vidéos, influenceur, exclusif, publicité, streaming, tendances"
         />
         <meta name="robots" content="index, follow" />
-        <link rel="canonical" href="https://este.netlify.app//" />
+        <link rel="canonical" href="https://runkko.netlify.app//" />
 
         {/* Open Graph / Facebook */}
         <meta
           property="og:title"
-          content="Este_YTB - Le YouTuber à découvrir !"
+          content="Runkko - Le YouTuber à découvrir !"
         />
         <meta
           property="og:description"
-          content="Découvrez Este_YTB, le YouTuber à suivre absolument ! Profitez de ses contenus exclusifs sur la plateforme vidéo innovante Este_YTB."
+          content="Découvrez Runkko, le YouTuber à suivre absolument ! Profitez de ses contenus exclusifs sur la plateforme vidéo innovante Runkko."
         />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://este.netlify.app//" />
+        <meta property="og:url" content="https://runkko.netlify.app//" />
         <meta
           property="og:image"
-          content="https://este.netlify.app//favicon.webp"
+          content="https://runkko.netlify.app//favicon.webp"
         />
 
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta
           name="twitter:title"
-          content="Este_YTB - Le YouTuber à découvrir !"
+          content="Runkko - Le YouTuber à découvrir !"
         />
         <meta
           name="twitter:description"
-          content="Découvrez Este_YTB, le YouTuber à suivre absolument ! Profitez de ses contenus exclusifs sur la plateforme vidéo innovante Este_YTB."
+          content="Découvrez Runkko, le YouTuber à suivre absolument ! Profitez de ses contenus exclusifs sur la plateforme vidéo innovante Runkko."
         />
         <meta
           name="twitter:image"
-          content="https://este.netlify.app//favicon.webp"
+          content="https://runkko.netlify.app//favicon.webp"
         />
-        <meta name="twitter:site" content="@este" />
-        <meta name="twitter:creator" content="@este" />
+        <meta name="twitter:site" content="@runkko" />
+        <meta name="twitter:creator" content="@runkko" />
       </Head>
       <div>
         <Header />

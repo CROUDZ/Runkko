@@ -8,18 +8,19 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: "var(--primary)",
-        secondary: "var(--secondary)",
-        neutral: {
-          white: "var(--neutral-white)",
-          lightGray: "var(--neutral-light-gray)",
-          darkGray: "var(--neutral-dark-gray)",
+        primary: {
+          blue: "#2824FF",
+          violet: "#5E24FF",
         },
-        background: "var(--background)",
-        text: "var(--text-color)",
-        link: "var(--link-color)",
-        button: "var(--button-color)",
-        buttonHover: "var(--button-hover-color)",
+        secondary: {
+          blue: "#A3A0FF",
+          violet: "#C3A6FF",
+        },
+        neutral: {
+          white: "#FFFFFF",
+          "light-gray": "#F5F5F5",
+          "dark-gray": "#333333",
+        },
       },
       screens: {
         "2xs": "320px",
