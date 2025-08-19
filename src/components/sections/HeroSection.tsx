@@ -3,220 +3,211 @@
 import React from "react";
 import Image from "next/image";
 import { m } from "framer-motion";
-import { Play, Users, ExternalLink } from "lucide-react";
+import { Play, Users, ExternalLink, Zap, Trophy } from "lucide-react";
 import { useYouTube } from "@/contexts/YouTubeContext";
+import BackgroundElements from "@/components/shared/BackgroundElements";
+import { StatCard, GlassCard } from "@/components/shared/GlassCard";
+import CTAButton from "@/components/shared/CTAButton";
 
-import RunkkoBody from "@/assets/runkko-body.webp";
+import Este_YTBBody from "@/assets/este-body.webp";
 
 const HeroSection: React.FC = () => {
   const { data } = useYouTube();
   const liveData = data?.liveData || { isLive: false, url: false };
 
   return (
-    <section className="relative min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 overflow-hidden">
-      {/* Background Effects */}
-      <div className="absolute inset-0 bg-black/20"></div>
-      <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
+    <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-800 overflow-hidden pt-16">
+      <BackgroundElements />
 
-      {/* Floating particles effect */}
-      <div className="absolute inset-0 hidden sm:block">
-        {[...Array(6)].map((_, i) => (
-          <m.div
-            key={i}
-            className="absolute w-1 h-1 sm:w-2 sm:h-2 bg-white rounded-full opacity-20"
-            animate={{
-              y: [-20, -100],
-              opacity: [0, 1, 0],
-            }}
-            transition={{
-              duration: 3,
-              delay: i * 0.5,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-            style={{
-              left: `${20 + i * 15}%`,
-              top: "80%",
-            }}
-          />
-        ))}
-      </div>
-
-      <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 pb-8 sm:pb-10">
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-[calc(100vh-8rem)] sm:min-h-[80vh]">
-          {/* Left Content */}
-          <m.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-white space-y-6 sm:space-y-8 order-2 lg:order-1 text-center sm:text-left flex flex-col items-center sm:items-start"
-          >
-            {/* Badge */}
-            <m.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className={`inline-flex items-center px-3 sm:px-4 py-2 mt-4 sm:mt-6 ${
-                liveData.isLive
-                  ? "bg-red-600/20 border border-red-500/30 text-red-300"
-                  : "bg-gray-600/20 border border-gray-500/30 text-gray-300"
-              } rounded-full text-xs sm:text-sm font-medium`}
-            >
+      <div className="relative z-10 container mx-auto px-6 py-24">
+        {/* Status Bar avec design unifié */}
+        <m.div
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="flex justify-center mb-16"
+        >
+          <div className={`flex items-center gap-3 px-6 py-3 rounded-full backdrop-blur-lg border ${
+            liveData.isLive
+              ? "bg-red-500/10 border-red-400/30 text-red-300"
+              : "bg-slate-700/30 border-slate-500/30 text-slate-300"
+          }`}>
+            <div className={`w-2 h-2 rounded-full ${liveData.isLive ? 'bg-red-400 animate-pulse' : 'bg-slate-400'}`}></div>
+            <span className="text-sm font-medium">
               {liveData.isLive ? (
                 <>
-                  🔴 EN LIVE •{" "}
-                  <a
-                    href={liveData.url || "#"}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline"
-                  >
-                    Minecraft Bedwars
-                  </a>
+                  LIVE - <a href={liveData.url || "#"} target="_blank" rel="noopener noreferrer" className="underline hover:no-underline">Minecraft Bedwars</a>
                 </>
               ) : (
-                "⚪ Hors ligne"
+                "Actuellement hors ligne"
               )}
-            </m.div>
+            </span>
+          </div>
+        </m.div>
 
-            {/* Main Title */}
-            <m.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="w-full"
-            >
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
-                Bienvenue sur
-                <span className="block bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500 bg-clip-text text-transparent">
-                  Runkko
+        <div className="grid lg:grid-cols-12 gap-12 items-center min-h-[70vh]">
+          
+          {/* Section gauche - Contenu principal */}
+          <m.div
+            initial={{ opacity: 0, x: -60 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="lg:col-span-4 text-white space-y-8"
+          >
+            {/* En-tête avec design unifié */}
+            <div className="space-y-6">
+              <div className="section-header-icons">
+                <div className="icon-circle-primary">
+                  <Play className="w-6 h-6 text-white" />
+                </div>
+                <div className="icon-divider"></div>
+                <div className="icon-circle-secondary">
+                  <Users className="w-6 h-6 text-white" />
+                </div>
+              </div>
+
+              <h2 className="text-2xl font-bold gradient-text-primary">
+                Este_YTB
+              </h2>
+              <h1 className="section-title">
+                Gaming &
+                <span className="block gradient-text-secondary">
+                  Aventures
                 </span>
               </h1>
-            </m.div>
+            </div>
 
-            {/* Description */}
-            <m.p
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="text-lg sm:text-xl lg:text-2xl text-gray-300 leading-relaxed max-w-2xl mx-auto sm:mx-0"
-            >
-              🎮 <strong>100% fun, skill et bonne humeur</strong> ! Spécialiste
-              Minecraft Bedwars avec des clutchs de fou, du multi-gaming et des
-              moments épiques à partager !
-            </m.p>
+            <p className="section-subtitle">
+              Plongez dans l'univers Minecraft avec 8 ans d'expertise ! PvP intense, constructions épiques, mods exclusifs et découvertes multi-gaming vous attendent.
+            </p>
 
-            {/* Stats */}
-            <m.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8 }}
-              className="flex flex-wrap gap-3 sm:gap-6 text-xs sm:text-sm justify-center sm:justify-start"
-            >
-              <div className="flex items-center gap-2 bg-white/10 px-3 sm:px-4 py-2 rounded-lg">
-                <Play className="w-3 h-3 sm:w-4 sm:h-4 text-red-400" />
-                <span>Videos épiques</span>
+            {/* Icons avec design unifié */}
+            <div className="flex flex-wrap gap-4">
+              <div className="glass-card px-4 py-2">
+                <div className="flex items-center gap-2">
+                  <Zap className="w-4 h-4 text-yellow-400" />
+                  <span className="text-sm">Action</span>
+                </div>
               </div>
-              <div className="flex items-center gap-2 bg-white/10 px-3 sm:px-4 py-2 rounded-lg">
-                <Users className="w-3 h-3 sm:w-4 sm:h-4 text-blue-400" />
-                <span>Communauté active</span>
+              <div className="glass-card px-4 py-2">
+                <div className="flex items-center gap-2">
+                  <Trophy className="w-4 h-4 text-cyan-400" />
+                  <span className="text-sm">Expert</span>
+                </div>
               </div>
-            </m.div>
+            </div>
 
-            {/* CTA Buttons */}
-            <m.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1 }}
-              className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center sm:items-start"
+            {/* CTA Button unifié */}
+            <CTAButton
+              href="https://www.youtube.com/@Este_YTB_YT"
+              leftIcon={Play}
+              rightIcon={ExternalLink}
             >
-              {/* YouTube CTA */}
-              <m.a
-                href="https://www.youtube.com/@Runkko_YT"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-lg hover:shadow-red-600/25 group text-sm sm:text-base"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2 group-hover:scale-110 transition-transform" />
-                Ma chaîne YouTube
-                <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 ml-2 opacity-70" />
-              </m.a>
-
-              {/* Discord CTA */}
-              <m.a
-                href="https://discord.gg/t6U4hZDrnF"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-lg hover:shadow-indigo-600/25 group text-sm sm:text-base"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Users className="w-4 h-4 sm:w-5 sm:h-5 mr-2 group-hover:scale-110 transition-transform" />
-                Rejoindre Discord
-                <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 ml-2 opacity-70" />
-              </m.a>
-            </m.div>
+              Découvrir la chaîne
+            </CTAButton>
           </m.div>
 
-          {/* Right Content - Character Image */}
+          {/* Section centrale - Image avec design circulaire unifié */}
           <m.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="relative flex justify-center lg:justify-end order-1 lg:order-2 mt-8 sm:mt-0"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="lg:col-span-4 flex justify-center relative"
           >
-            {/* Glow effect behind character */}
-            <div className="absolute inset-0 bg-gradient-to-t from-yellow-400/20 via-transparent to-transparent rounded-full blur-3xl scale-150"></div>
-
-            {/* Character image with hover animation */}
-            <m.div
-              whileHover={{ scale: 1.05, rotate: 2 }}
-              transition={{ duration: 0.3 }}
-              className="relative z-10"
-            >
-              <Image
-                src={RunkkoBody}
-                alt="Runkko - Personnage Minecraft"
-                width={400}
-                height={600}
-                className="w-64 sm:w-80 lg:w-96 h-auto object-contain drop-shadow-2xl"
-                priority
-              />
-            </m.div>
-
-            {/* Decorative elements */}
+            {/* Anneaux rotatifs avec design unifié */}
             <m.div
               animate={{ rotate: 360 }}
-              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-              className="absolute top-5 sm:top-10 right-5 sm:right-10 w-12 h-12 sm:w-20 sm:h-20 border-2 border-yellow-400/30 rounded-full hidden sm:block"
+              transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+              className="absolute inset-0 w-80 h-80 border border-purple-400/20 rounded-full"
             />
             <m.div
               animate={{ rotate: -360 }}
-              transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-              className="absolute bottom-10 sm:bottom-20 left-5 sm:left-10 w-10 h-10 sm:w-16 sm:h-16 border-2 border-pink-400/30 rounded-full hidden sm:block"
+              transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+              className="absolute inset-4 w-72 h-72 border border-cyan-400/20 rounded-full"
             />
+            
+            {/* Centre lumineux */}
+            <div className="absolute inset-8 bg-gradient-to-br from-purple-400/10 to-cyan-400/10 rounded-full backdrop-blur-sm"></div>
+            
+            <m.div
+              whileHover={{ scale: 1.1, rotate: 5 }}
+              transition={{ type: "spring", stiffness: 300 }}
+              className="relative z-10"
+            >
+              <Image
+                src={Este_YTBBody}
+                alt="Este_YTB Character"
+                width={320}
+                height={480}
+                className="w-64 h-auto object-contain filter drop-shadow-2xl"
+                priority
+              />
+            </m.div>
+          </m.div>
+
+          {/* Section droite - Stats & Discord avec design unifié */}
+          <m.div
+            initial={{ opacity: 0, x: 60 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+            className="lg:col-span-4 space-y-8"
+          >
+            {/* Cartes de stats avec design unifié */}
+            <div className="grid grid-cols-2 gap-4">
+              <StatCard
+                icon={Play}
+                value="200+"
+                label="Vidéos"
+                iconColor="text-red-400"
+              />
+              
+              <StatCard
+                icon={Users}
+                value="5K+"
+                label="Abonnés"
+                iconColor="text-cyan-400"
+              />
+            </div>
+
+            {/* Section Discord avec design unifié */}
+            <GlassCard>
+              <h3 className="text-xl font-bold text-white mb-3">Rejoins la communauté</h3>
+              <p className="text-slate-300 mb-4 text-sm">
+                Connecte-toi avec d'autres joueurs, partage tes créations et reste informé des dernières news !
+              </p>
+              <CTAButton
+                href="https://discord.gg/t6U4hZDrnF"
+                leftIcon={Users}
+                rightIcon={ExternalLink}
+                className="w-full justify-center"
+                size="sm"
+              >
+                Rejoindre Discord
+              </CTAButton>
+            </GlassCard>
           </m.div>
         </div>
 
-        {/* Scroll indicator */}
+        {/* Indicateur de scroll unifié */}
         <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.5 }}
-          className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 hidden sm:block"
+          transition={{ delay: 1.2 }}
+          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 hidden lg:block"
         >
           <m.div
-            animate={{ y: [0, 10, 0] }}
+            animate={{ y: [0, 8, 0] }}
             transition={{ duration: 2, repeat: Infinity }}
-            className="w-5 h-8 sm:w-6 sm:h-10 border-2 border-white/30 rounded-full flex justify-center"
+            className="flex flex-col items-center text-slate-400"
           >
-            <m.div
-              animate={{ y: [0, 12, 0] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="w-1 h-2 sm:h-3 bg-white/60 rounded-full mt-1 sm:mt-2"
-            />
+            <span className="text-xs mb-2">Explorer plus</span>
+            <div className="w-6 h-10 border border-slate-400 rounded-full flex justify-center items-start pt-2">
+              <m.div
+                animate={{ y: [0, 12, 0] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="w-1 h-3 bg-slate-400 rounded-full"
+              />
+            </div>
           </m.div>
         </m.div>
       </div>

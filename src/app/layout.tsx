@@ -4,9 +4,9 @@ import MotionProvider from "@/components/MotionProvider";
 import { YouTubeProvider } from "@/contexts/YouTubeContext";
 
 export const metadata: Metadata = {
-  title: "Runkko - Le YouTuber à découvrir !",
+  title: "Este_YTB - Le YouTuber à découvrir !",
   description:
-    "Découvrez Runkko, le YouTuber à suivre absolument ! Profitez de ses contenus exclusifs sur la plateforme vidéo innovante Runkko.",
+    "Découvrez Este_YTB, le YouTuber à suivre absolument ! Profitez de ses contenus exclusifs sur la plateforme vidéo innovante Este_YTB.",
   icons: {
     icon: "/favicon.webp",
   },
