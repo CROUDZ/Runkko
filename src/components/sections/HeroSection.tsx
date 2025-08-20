@@ -5,6 +5,7 @@ import Image from "next/image";
 import { m } from "framer-motion";
 import { Play, Users, ExternalLink } from "lucide-react";
 import { useYouTube } from "@/contexts/YouTubeContext";
+import CTAButton from "@/components/CTAButton";
 
 import RunkkoBody from "@/assets/runkko-body.webp";
 
@@ -131,32 +132,22 @@ const HeroSection: React.FC = () => {
               className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center sm:items-start"
             >
               {/* YouTube CTA */}
-              <m.a
+              <CTAButton
                 href="https://www.youtube.com/@Runkko_YT"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-lg hover:shadow-red-600/25 group text-sm sm:text-base"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                leftIcon={Play}
+                rightIcon={ExternalLink}
               >
-                <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2 group-hover:scale-110 transition-transform" />
                 Ma chaîne YouTube
-                <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 ml-2 opacity-70" />
-              </m.a>
+              </CTAButton>
 
               {/* Discord CTA */}
-              <m.a
+              <CTAButton
                 href="https://discord.gg/t6U4hZDrnF"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-lg hover:shadow-indigo-600/25 group text-sm sm:text-base"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                leftIcon={Users}
+                rightIcon={ExternalLink}
               >
-                <Users className="w-4 h-4 sm:w-5 sm:h-5 mr-2 group-hover:scale-110 transition-transform" />
                 Rejoindre Discord
-                <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 ml-2 opacity-70" />
-              </m.a>
+              </CTAButton>
             </m.div>
           </m.div>
 

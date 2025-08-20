@@ -13,6 +13,7 @@ import {
   Gift,
 } from "lucide-react";
 import { useYouTube } from "@/contexts/YouTubeContext";
+import CTAButton from "@/components/CTAButton";
 
 const SubscriberProgressSection: React.FC = () => {
   const { data } = useYouTube();
@@ -426,18 +427,13 @@ const SubscriberProgressSection: React.FC = () => {
 
             {/* Boutons d'action */}
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
-              <m.a
-                href="https://www.youtube.com/@Runkko_YT"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-3 px-8 py-4 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-red-600/30 group text-lg"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.95 }}
+              <CTAButton
+                href="https://discord.gg/t6U4hZDrnF"
+                leftIcon={Users}
+                rightIcon={ExternalLink}
               >
-                <Users className="w-5 h-5 group-hover:scale-105 transition-transform" />
                 S'abonner maintenant
-                <ExternalLink className="w-4 h-4 opacity-70" />
-              </m.a>
+              </CTAButton>
 
               <div className="text-center text-sm text-gray-400 max-w-xs">
                 🎁 Chaque nouveau palier débloque du contenu exclusif et des
