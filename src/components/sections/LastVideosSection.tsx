@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import LoadingSpinner from "../LoadingSpinner";
 import { useYouTube } from "@/contexts/YouTubeContext";
+import CTAButton from "@/components/CTAButton";
 
 const LastVideosSection: React.FC = () => {
   const { data, loading, error, refetch } = useYouTube();
@@ -244,18 +245,14 @@ const LastVideosSection: React.FC = () => {
                 </div>
 
                 {/* CTA Button */}
-                <m.a
+                <CTAButton
                   href={`https://www.youtube.com/watch?v=${latestVideo.id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-lg hover:shadow-red-600/25 group"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  leftIcon={Play}
+                  rightIcon={ExternalLink}
+                  size="lg"
                 >
-                  <Play className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
                   Regarder maintenant
-                  <ExternalLink className="w-4 h-4 ml-2 opacity-70" />
-                </m.a>
+                </CTAButton>
               </m.div>
             </div>
           </m.div>
