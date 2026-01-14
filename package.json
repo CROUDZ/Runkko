@@ -14,10 +14,10 @@
     "framer-motion": "^12.23.12",
     "lucide-react": "^0.539.0",
     "netlify-cli": "^23.1.4",
-    "next": "15.3.4",
+    "next": "^16.1.1",
     "prettier": "^3.6.2",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
     "react-icons": "^5.5.0"
   },
   "devDependencies": {
