@@ -33,8 +33,10 @@ class YouTubeService {
   private readonly ERROR_COOLDOWN = this.CACHE_DURATION; // cooldown après erreur
 
   private getApiUrl(): string {
+    // En développement, utiliser l'API route Next.js
+    // En production, utiliser la Netlify Function
     return process.env.NODE_ENV === "development"
-      ? "http://localhost:8888/.netlify/functions/youtube"
+      ? "/api/youtube"
       : "/.netlify/functions/youtube";
   }
 
